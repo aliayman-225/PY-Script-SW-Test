@@ -34,6 +34,7 @@ The script only uses standard Python libraries, so no additional dependencies ar
 To execute the script, use the following command:
 ```bash
 python task_script.py
+```
 
 The script will perform the following tasks:
 - Create a SQLite database (sample.db).
