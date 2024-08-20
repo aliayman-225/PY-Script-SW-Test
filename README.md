@@ -22,7 +22,7 @@ This Python script manages a simple SQLite database, inserts sample data, export
 
    ```bash
    git clone https://github.com/aliayman-225/PY-Script-SW-Test
-   cd your-repository-name
+   cd <your-path>/PY-Script-SW-Test
 
 
 ## Install Dependencies
