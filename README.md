@@ -29,6 +29,18 @@ This Python script manages a simple SQLite database, inserts sample data, export
 
 The script only uses standard Python libraries, so no additional dependencies are required.
 
+## Database Creation
+The SQLite database can be created in two ways:
+
+1. **Automatically by the Script**: The script includes functionality to automatically create the SQLite database (sample.db) and the necessary table if they do not already exist. No additional steps are required on your part.
+
+2. **Manually using DB Browser for SQLite**: Alternatively, you can create the database manually using a tool like DB Browser for SQLite. Simply create a new database named sample.db and add a table named data with the following fields:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- name (TEXT)
+- email (TEXT)
+- zip_code (TEXT)
+- title (TEXT)
+
 ## Usage
 
 To execute the script, use the following command:
