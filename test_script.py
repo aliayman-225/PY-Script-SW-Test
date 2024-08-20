@@ -5,7 +5,7 @@ import json
 import csv
 from unittest import mock
 from io import StringIO
-from Task import create_database, insert_sample_data, export_to_csv, export_to_json, generate_report
+from task_script import create_database, insert_sample_data, export_to_csv, export_to_json, generate_report
 
 class TestDatabaseFunctions(unittest.TestCase):
     records = [
