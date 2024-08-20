@@ -1,5 +1,3 @@
-import sys
-import subprocess
 import sqlite3
 import csv
 import json
@@ -7,7 +5,6 @@ import os
 import ast
 import random
 from collections import Counter
-
 # No dependencies need to check as we're using only standard libraries
 
 # Function to create the SQLite database and table
@@ -19,67 +16,56 @@ def create_database(db_name='sample.db'):
     """
 
     try:
-        conn = sqlite3.connect(db_name)
-        cursor = conn.cursor()
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT ,
-            email TEXT ,
-            zip_code TEXT ,
-            title TEXT 
-        )
-        ''')
-        conn.commit()
+        with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS data (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                email TEXT,
+                zip_code TEXT,
+                title TEXT
+            )
+            ''')
+            conn.commit()
     except sqlite3.Error as e:
         print(f"Error creating database: {e}")
-    finally:
-        if conn:
-            conn.close()
-
 
 # Function to insert sample data into the database
 def insert_sample_data(input_data, db_name='sample.db'):
     """
     Inserts data from a text file or an array of records into the 'data' table in the SQLite database.
-    
     Parameters:
     input_data (str or list): The path to the text file containing the records or a list of records.
     db_name (str): The name of the SQLite database file.
     """
 
     try:
+        records = []
         # Check if input_data is a string, assume it's a file path
         if isinstance(input_data, str) and os.path.isfile(input_data):
-            # Read the contents of the file
+            # Read the contents of the file & Convert the content string to a list of tuples
             with open(input_data, 'r') as file:
-                content = file.read()
-            # Convert the content string to a list of tuples
-            records = ast.literal_eval(content.strip())
+                records = ast.literal_eval(file.read().strip())
+
         elif isinstance(input_data, list):
             # If input_data is a list, use it directly as records
             records = input_data
         else:
             return "Invalid input: input_data must be a file path or a list of records."
-
         # Insert the records into the database
-        conn = sqlite3.connect(db_name)
-        cursor = conn.cursor()
-
-        cursor.executemany('''
-        INSERT INTO data (name, email, zip_code, title)
-        VALUES (?, ?, ?, ?)
-        ''', records)
-        conn.commit()
-        return f"Inserted {cursor.rowcount} records into the 'data' table."
-    
+        with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+            cursor.executemany('''
+            INSERT INTO data (name, email, zip_code, title)
+            VALUES (?, ?, ?, ?)
+            ''', records)
+            conn.commit()
+            return f"Inserted {cursor.rowcount} records into the 'data' table."
     except sqlite3.Error as e:
         return f"Error inserting sample data: {e}"
     except (SyntaxError, ValueError) as e:
         return f"Error parsing the records: {e}"
-    finally:
-        if 'conn' in locals():
-            conn.close()
 
 
 # Function to export data from the database to a CSV file
@@ -91,24 +77,19 @@ def export_to_csv(db_name='sample.db', csv_file_path='data.csv'):
     csv_file_path (str): The file path and name where the CSV file will be saved.
     """
     try:
-        conn = sqlite3.connect(db_name)
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM data')
-        rows = cursor.fetchall()
-
-        with open(csv_file_path, mode='w', newline='', encoding='utf-8') as csv_file:
+        with sqlite3.connect(db_name) as conn, open(csv_file_path, mode='w', newline='', encoding='utf-8') as csv_file:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM data')
+            rows = cursor.fetchall()
             writer = csv.writer(csv_file)
             # Write the header
             writer.writerow([i[0] for i in cursor.description])
             # Write the data rows
-            writer.writerows(rows)
-        print(f"Data successfully exported to {csv_file_path}")
+            writer.writerows(rows)  
+        return f"Data successfully exported to {csv_file_path}"
     except (sqlite3.Error, IOError) as e:
         print(f"Error exporting data to CSV: {e}")
-    finally:
-        if conn:
-            conn.close()
-    return f"Data successfully exported to {csv_file_path}"
+
 
 # Function to export data from the database to a JSON file
 def export_to_json(db_name='sample.db', json_file_path='data.json'):
@@ -118,23 +99,18 @@ def export_to_json(db_name='sample.db', json_file_path='data.json'):
     db_name (str): The name of the SQLite database file.
     json_file_path (str): The file path and name where the JSON file will be saved.
     """
-    try:
-        conn = sqlite3.connect(db_name)
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM data')
-        rows = cursor.fetchall()
-        # Convert rows into a list of dictionaries
-        data = [{"id": row[0], "name": row[1], "email": row[2], "zip_code": row[3], "title": row[4]} for row in rows]
 
-        with open(json_file_path, mode='w', encoding='utf-8') as json_file:
-            json.dump(data, json_file, indent=4)
-        print(f"Data successfully exported to {json_file_path}")
+    try:
+        with sqlite3.connect(db_name) as conn, open(json_file_path, mode='w', encoding='utf-8') as json_file:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM data')
+            rows = cursor.fetchall()
+            # Convert rows into a list of dictionaries
+            data = [{"id": row[0], "name": row[1], "email": row[2], "zip_code": row[3], "title": row[4]} for row in rows]
+            json.dump(data, json_file, indent=4)       
+        return f"Data successfully exported to {json_file_path}"
     except (sqlite3.Error, IOError) as e:
-        print(f"Error exporting data to JSON: {e}")
-    finally:
-        if conn:
-            conn.close()
-    return f"Data successfully exported to {json_file_path}"
+        return f"Error exporting data to JSON: {e}"
 
 # Function to read CSV and JSON files and generate a report
 def generate_report(csv_file_path='data.csv', json_file_path='data.json', report_file_path='report.txt'):
@@ -168,8 +144,8 @@ def generate_report(csv_file_path='data.csv', json_file_path='data.json', report
         with open(json_file_path, mode='r', encoding='utf-8') as json_file:
             data = json.load(json_file)
 
-        titles = [entry['title'] for entry in data]
-        title_count = {title: titles.count(title) for title in set(titles)}
+        titles = [entry['title'] for entry in data]      
+        title_count = Counter(titles)
 
         # Additional statistics
         unique_names = len(set(entry['name'] for entry in data))
