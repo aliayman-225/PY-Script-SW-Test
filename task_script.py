@@ -8,10 +8,7 @@ import ast
 import random
 from collections import Counter
 
-
-
 # No dependencies need to check as we're using only standard libraries
-
 
 # Function to create the SQLite database and table
 def create_database(db_name='sample.db'):
@@ -27,10 +24,10 @@ def create_database(db_name='sample.db'):
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            zip_code TEXT NOT NULL,
-            title TEXT NOT NULL
+            name TEXT ,
+            email TEXT ,
+            zip_code TEXT ,
+            title TEXT 
         )
         ''')
         conn.commit()
@@ -42,22 +39,28 @@ def create_database(db_name='sample.db'):
 
 
 # Function to insert sample data into the database
-def insert_sample_data(file_path, db_name='sample.db'):
-
+def insert_sample_data(input_data, db_name='sample.db'):
     """
-    Inserts data from a text file into the 'data' table in the SQLite database.
+    Inserts data from a text file or an array of records into the 'data' table in the SQLite database.
+    
     Parameters:
-    file_path (str): The path to the text file containing the records.
+    input_data (str or list): The path to the text file containing the records or a list of records.
     db_name (str): The name of the SQLite database file.
     """
 
     try:
-        # Read the contents of the file
-        with open(file_path, 'r') as file:
-            content = file.read()
-
-        # Convert the content string to a list of tuples
-        records = ast.literal_eval(content.strip())
+        # Check if input_data is a string, assume it's a file path
+        if isinstance(input_data, str) and os.path.isfile(input_data):
+            # Read the contents of the file
+            with open(input_data, 'r') as file:
+                content = file.read()
+            # Convert the content string to a list of tuples
+            records = ast.literal_eval(content.strip())
+        elif isinstance(input_data, list):
+            # If input_data is a list, use it directly as records
+            records = input_data
+        else:
+            return "Invalid input: input_data must be a file path or a list of records."
 
         # Insert the records into the database
         conn = sqlite3.connect(db_name)
@@ -68,7 +71,6 @@ def insert_sample_data(file_path, db_name='sample.db'):
         VALUES (?, ?, ?, ?)
         ''', records)
         conn.commit()
-        
         return f"Inserted {cursor.rowcount} records into the 'data' table."
     
     except sqlite3.Error as e:
@@ -76,9 +78,8 @@ def insert_sample_data(file_path, db_name='sample.db'):
     except (SyntaxError, ValueError) as e:
         return f"Error parsing the records: {e}"
     finally:
-        if conn:
+        if 'conn' in locals():
             conn.close()
-
 
 
 # Function to export data from the database to a CSV file
@@ -195,7 +196,7 @@ def generate_report(csv_file_path='data.csv', json_file_path='data.json', report
             f"------------------------------------------------------------------------------------------------",
 
             f"\n====================================Sample records from CSV:====================================",
-            *[str(row) for row in random_sample],  # Display the first 5 records
+            *[str(row) for row in random_sample],  # Display 5 random records
             f"================================================================================================",
 
             f"\n====================================Occurrences==================================================",
@@ -224,7 +225,6 @@ def generate_report(csv_file_path='data.csv', json_file_path='data.json', report
             for line in report_content:
                 print(line)
                 report_file.write(line + "\n")
-
         print(f"\nReport successfully saved to {report_file_path}")
 
     except (IOError, json.JSONDecodeError, FileNotFoundError) as e:
