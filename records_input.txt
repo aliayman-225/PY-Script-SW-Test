@@ -1,0 +1,12 @@
+[
+    ("Ali Ayman", "aliayman225@gmail.com", "12511", "DevOps Engineer"),
+    ("John Adel", "john@gmail.com", "14742", "Senior DevOps Engineer"),
+    ("Nour Samir", "john@yahoo.com", "74885", "Software Engineer"),
+    ("Karim Khaled", "karimkhaled@yahoo.com", "12511", "Software Engineer"),
+    ("Karim Khaled", "karimkhaled@gmail.com", "78441", "Database Administrator"),
+    ("Dalia Ahmed", "", "76543", "DevOps Engineer"),
+    ("Mohamed Samir", "mohamedsamir@gmail.com", "", "Security Analyst"),
+    ("Bahaa Ramy", "bahaaramy12@gmail.com", "12511", "Frontend Developer"),
+    ("Rania Gaber", "rania_gaber@gmail.com", "", "Backend Developer"),
+    ("Samy Mohamed", "samym@gmail.com", "12511", "QA Engineer")
+]
