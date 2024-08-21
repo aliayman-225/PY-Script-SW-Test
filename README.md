@@ -54,6 +54,22 @@ The script will perform the following tasks:
 - Export the data to data.csv and data.json.
 - Generate a report based on the exported data and display it in the console.
 
+## Input Data
+
+The script requires an input file (`records_input.txt`) that contains the records to be inserted into the database. This file should be a text file with a list of tuples, where each tuple represents a record to be inserted into the database.
+
+### Input Format
+
+The records in the input file should be formatted as follows:
+
+```plaintext
+[
+    ("John Doe", "john.doe@gmail.com", "12345", "Manager"),
+    ("Jane Smith", "jane.smith@yahoo.com", "54321", "Engineer"),
+    ...
+]
+```
+
 ## Output Files
 After running the script, you will find the following files in the directory:
 - sample.db: The SQLite database file.
