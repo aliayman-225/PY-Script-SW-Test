@@ -77,7 +77,7 @@ python task_script.py
 **Option 2**: Using Docker
 Alternatively, you can run the script inside a Docker container without needing to install Python or any dependencies on your system.
 ```bash
-docker build -t my-app
+docker build -t my-app .
 docker run --rm -v $(pwd):/app my-app
 ```
 
