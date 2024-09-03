@@ -5,6 +5,7 @@ import os
 import ast
 import random
 from collections import Counter
+import matplotlib.pyplot as plt
 # No dependencies need to check as we're using only standard libraries
 
 # Function to create the SQLite database and table
@@ -205,7 +206,52 @@ def generate_report(csv_file_path='data.csv', json_file_path='data.json', report
 
     except (IOError, json.JSONDecodeError, FileNotFoundError) as e:
         print(f"Error generating report: {e}")
+    
+    generate_visualizations(title_count, gmail_percentage, yahoo_percentage)
 
+
+    
+
+def generate_visualizations(title_count, gmail_percentage, yahoo_percentage):
+    """
+    Generates visualizations for statistics:
+    - A bar chart for title occurrences.
+    - A pie chart for email provider percentages (Gmail and Yahoo).
+    Parameters:
+    title_count (Counter): A Counter object with title frequencies.
+    gmail_percentage (float): Percentage of Gmail emails.
+    yahoo_percentage (float): Percentage of Yahoo emails.
+    """
+
+    # Ensure that percentages are non-negative
+    gmail_percentage = max(0, gmail_percentage)
+    yahoo_percentage = max(0, yahoo_percentage)
+
+    # Generate bar chart for title occurrences
+    plt.figure(figsize=(25, 13))
+
+    plt.bar(title_count.keys(), title_count.values(), color='skyblue')
+    plt.xlabel('Title')
+    plt.ylabel('Frequency')
+    plt.title('Title Occurrences in the Data')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('title_occurrences.png')
+    plt.close()
+
+    # Generate pie chart for email provider percentages
+    labels = ['Gmail', 'Yahoo']
+    sizes = [gmail_percentage, yahoo_percentage]
+    colors = ['#ff9999', '#66b3ff']
+
+    plt.figure(figsize=(7, 7))
+    plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    plt.title('Email Provider Distribution')
+    plt.axis('equal')
+    plt.savefig('email_provider_distribution.png')
+    plt.close()
+
+    print("Visualizations have been saved as 'title_occurrences.png' and 'email_provider_distribution.png'")
 
 # Main function to orchestrate the execution of all tasks
 def main():
